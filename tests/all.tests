@@ -1163,6 +1163,7 @@ for format in ('rgba', 'depth', 'stencil'):
         test_name = ' '.join(['framebuffer-blit-levels', test_mode, format])
         arb_framebuffer_object[test_name] = PlainExecTest(test_name + ' -auto')
 add_plain_test(arb_framebuffer_object, 'fbo-alpha')
+add_plain_test(arb_framebuffer_object, 'fbo-blit-after-swap')
 add_plain_test(arb_framebuffer_object, 'fbo-blit-stretch')
 add_plain_test(arb_framebuffer_object, 'fbo-blit-scaled-linear')
 add_plain_test(arb_framebuffer_object, 'fbo-attachments-blit-scaled-linear')
