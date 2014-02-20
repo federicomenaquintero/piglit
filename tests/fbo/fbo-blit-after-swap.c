@@ -84,16 +84,12 @@ setup_back_buffer(void)
 }
 
 static void
-blit_from_back_to_front(void)
+blit_from_back_to_front(int x0, int y0, int x1, int y1)
 {
-	int w = piglit_width;
-	int h = piglit_height;
-
-	/* Copy just the red square from the back buffer to the blue front buffer */
 	glDrawBuffer(GL_FRONT);
 	glReadBuffer(GL_BACK);
-	glBlitFramebufferEXT(w / 4, h / 4, 3 * w / 4, 3 * h / 4,
-			     w / 4, h / 4, 3 * w / 4, 3 * h / 4,
+	glBlitFramebufferEXT(x0, y0, x1, y1,
+			     x0, y0, x1, y1,
 			     GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
@@ -108,7 +104,8 @@ enum piglit_result piglit_display(void)
 	setup_front_buffer();
 	setup_back_buffer();
 
-	blit_from_back_to_front();
+	/* Copy just the red square from the back buffer to the blue front buffer */
+	blit_from_back_to_front(w / 4, h / 4, 3 * w / 4, 3 * h / 4);
 
 	glFlush();
 
@@ -117,13 +114,20 @@ enum piglit_result piglit_display(void)
 	glReadBuffer(GL_FRONT);
 
 	/* the middle should be red */
-	pass = piglit_probe_pixel_rgb(w / 2, h / 2, red) && pass;
+	pass = pass && piglit_probe_pixel_rgb(w / 2, h / 2, red);
 
 	/* the corners should be blue */
-	pass = piglit_probe_pixel_rgb(0, 0, blue) && pass;
-	pass = piglit_probe_pixel_rgb(w - 1, 0, blue) && pass;
-	pass = piglit_probe_pixel_rgb(0, h - 1, blue) && pass;
-	pass = piglit_probe_pixel_rgb(w - 1, h - 1, blue) && pass;
+	pass = pass && piglit_probe_pixel_rgb(0, 0, blue);
+	pass = pass && piglit_probe_pixel_rgb(w - 1, 0, blue);
+	pass = pass && piglit_probe_pixel_rgb(0, h - 1, blue);
+	pass = pass && piglit_probe_pixel_rgb(w - 1, h - 1, blue);
+
+	/* Blit some green goodness */
+
+	blit_from_back_to_front(0, 0, w / 4, h / 4);
+	glFlush();
+
+	pass = pass && piglit_probe_pixel_rgb(0, 0, green);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
