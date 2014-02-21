@@ -137,8 +137,6 @@ enum piglit_result piglit_display(void)
 
 	pass = pass && test_corner_and_center_colors(blue, green);
 
-	sleep (1);
-
 	/* Second, blue background, red square in the middle */
 
 	clear_to_color4fv(blue);
