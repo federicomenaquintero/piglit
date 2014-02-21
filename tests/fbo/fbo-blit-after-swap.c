@@ -109,45 +109,42 @@ enum piglit_result piglit_display(void)
 
 	piglit_ortho_projection(w, h, GL_FALSE);
 
-	setup_front_buffer();
-	setup_back_buffer();
+	glDrawBuffer(GL_BACK);
 
-	/* Copy just the red square from the back buffer to the blue front buffer */
-	blit_from_back_to_front(w / 4, h / 4, 3 * w / 4, 3 * h / 4);
+	/* First, blue background, green square in the middle */
 
+	clear_to_color4fv(blue);
+	draw_rect_with_color4fv(green, w / 4, h /4, w / 2, h / 2);
+	piglit_swap_buffers();
 	glFlush();
 
-	/* Now see how we did... */
-
+	/* The corners should be blue; the center should be green */
 	glReadBuffer(GL_FRONT);
-
-	/* the middle should be red */
-	pass = pass && piglit_probe_pixel_rgb(w / 2, h / 2, red);
-
-	/* the corners should be blue */
 	pass = pass && piglit_probe_pixel_rgb(0, 0, blue);
 	pass = pass && piglit_probe_pixel_rgb(w - 1, 0, blue);
 	pass = pass && piglit_probe_pixel_rgb(0, h - 1, blue);
 	pass = pass && piglit_probe_pixel_rgb(w - 1, h - 1, blue);
+	pass = pass && piglit_probe_pixel_rgb(w / 2, h / 2, green);
 
-	/* Blit some green goodness */
+	sleep (1);
 
-	blit_from_back_to_front(0, 0, w / 4, h / 4);
+	/* Second, blue background, red square in the middle */
+
+	clear_to_color4fv(blue);
+	draw_rect_with_color4fv(red, w / 4, h /4, w / 2, h / 2);
+
+	/* Blit just the magenta square */
+	blit_from_back_to_front(w / 4, h / 4, w / 4 + w / 2, h / 4 + h / 2);
 	glFlush();
-
-	/* Add a magenta square, swap buffers, and test again */
-	glDrawBuffer(GL_BACK);
-
-	draw_rect_with_color4fv(magenta, w - 10, h - 10, 10, 10);
-
-	piglit_swap_buffers();
-
-	pass = pass && piglit_probe_pixel_rgb(0, 0, green);
-	pass = pass && piglit_probe_pixel_rgb(w - 1, 0, green);
-	pass = pass && piglit_probe_pixel_rgb(0, h - 1, green);
-	pass = pass && piglit_probe_pixel_rgb(w - 1, h - 1, magenta);
-	pass = pass && piglit_probe_pixel_rgb(w / 2 - 1, h / 2 - 1, red);
-
+	
+	/* The corners should be blue; the center should be red */
+	glReadBuffer(GL_FRONT);
+	pass = pass && piglit_probe_pixel_rgb(0, 0, blue);
+	pass = pass && piglit_probe_pixel_rgb(w - 1, 0, blue);
+	pass = pass && piglit_probe_pixel_rgb(0, h - 1, blue);
+	pass = pass && piglit_probe_pixel_rgb(w - 1, h - 1, blue);
+	pass = pass && piglit_probe_pixel_rgb(w / 2, h / 2, red);
+	
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
 
