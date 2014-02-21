@@ -49,12 +49,17 @@ static const GLfloat magenta[] = {1.0f, 0.0f, 1.0f, 1.0f};
 static const GLfloat black[]   = {0.0f, 0.0f, 0.0f, 1.0f};
 
 static void
+clear_to_color4fv(const GLfloat *color)
+{
+	glClearColor(color[0], color[1], color[2], color[3]);
+	glClear(GL_COLOR_BUFFER_BIT);
+}
+
+static void
 setup_front_buffer(void)
 {
 	glDrawBuffer(GL_BACK);
-
-	glClearColor(blue[0], blue[1], blue[2], blue[3]);
-	glClear(GL_COLOR_BUFFER_BIT);
+	clear_to_color4fv(blue);
 
 	if (use_swap_buffers)
 		piglit_swap_buffers();
@@ -74,10 +79,7 @@ setup_back_buffer(void)
 	int h = piglit_height;
 
 	glDrawBuffer(GL_BACK);
-
-	/* Clear to green */
-	glClearColor(green[0], green[1], green[2], green[3]);
-	glClear(GL_COLOR_BUFFER_BIT);
+	clear_to_color4fv(green);
 
 	/* Paint a red square in the middle of the back buffer */
 	glColor4fv(red);
