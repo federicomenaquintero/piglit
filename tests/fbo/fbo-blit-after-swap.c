@@ -42,10 +42,11 @@ PIGLIT_GL_TEST_CONFIG_END
 
 static bool use_swap_buffers = true;
 
-static const GLfloat red[]   = {1.0f, 0.0f, 0.0f, 1.0f};
-static const GLfloat green[] = {0.0f, 1.0f, 0.0f, 1.0f};
-static const GLfloat blue[]  = {0.0f, 0.0f, 1.0f, 1.0f};
-static const GLfloat black[] = {0.0f, 0.0f, 0.0f, 1.0f};
+static const GLfloat red[]     = {1.0f, 0.0f, 0.0f, 1.0f};
+static const GLfloat green[]   = {0.0f, 1.0f, 0.0f, 1.0f};
+static const GLfloat blue[]    = {0.0f, 0.0f, 1.0f, 1.0f};
+static const GLfloat magenta[] = {1.0f, 0.0f, 1.0f, 1.0f};
+static const GLfloat black[]   = {0.0f, 0.0f, 0.0f, 1.0f};
 
 static void
 setup_front_buffer(void)
@@ -127,7 +128,18 @@ enum piglit_result piglit_display(void)
 	blit_from_back_to_front(0, 0, w / 4, h / 4);
 	glFlush();
 
+	/* Add a magenta square, swap buffers, and test again */
+	glDrawBuffer(GL_BACK);
+	glColor4fv(magenta);
+	piglit_draw_rect(w - 10, h - 10, 10, 10);
+
+	piglit_swap_buffers();
+
 	pass = pass && piglit_probe_pixel_rgb(0, 0, green);
+	pass = pass && piglit_probe_pixel_rgb(w - 1, 0, green);
+	pass = pass && piglit_probe_pixel_rgb(0, h - 1, green);
+	pass = pass && piglit_probe_pixel_rgb(w - 1, h - 1, magenta);
+	pass = pass && piglit_probe_pixel_rgb(w / 2 - 1, h / 2 - 1, red);
 
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
