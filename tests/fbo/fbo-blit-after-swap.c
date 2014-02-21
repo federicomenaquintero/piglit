@@ -56,6 +56,13 @@ clear_to_color4fv(const GLfloat *color)
 }
 
 static void
+draw_rect_with_color4fv(const GLfloat *color, int x, int y, int w, int h)
+{
+	glColor4fv(color);
+	piglit_draw_rect(x, y, w, h);
+}
+
+static void
 setup_front_buffer(void)
 {
 	glDrawBuffer(GL_BACK);
@@ -79,11 +86,9 @@ setup_back_buffer(void)
 	int h = piglit_height;
 
 	glDrawBuffer(GL_BACK);
-	clear_to_color4fv(green);
 
-	/* Paint a red square in the middle of the back buffer */
-	glColor4fv(red);
-	piglit_draw_rect(w / 4, h / 4, w / 2, h / 2);
+	clear_to_color4fv(green);
+	draw_rect_with_color4fv(red, w / 4, h / 4, w / 2, h / 2);
 }
 
 static void
@@ -132,8 +137,8 @@ enum piglit_result piglit_display(void)
 
 	/* Add a magenta square, swap buffers, and test again */
 	glDrawBuffer(GL_BACK);
-	glColor4fv(magenta);
-	piglit_draw_rect(w - 10, h - 10, 10, 10);
+
+	draw_rect_with_color4fv(magenta, w - 10, h - 10, 10, 10);
 
 	piglit_swap_buffers();
 
