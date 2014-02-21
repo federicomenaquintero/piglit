@@ -101,6 +101,23 @@ blit_from_back_to_front(int x0, int y0, int x1, int y1)
 			     GL_COLOR_BUFFER_BIT, GL_NEAREST);
 }
 
+static bool
+test_corner_and_center_colors(const GLfloat *corner, const GLfloat *center)
+{
+	int w = piglit_width;
+	int h = piglit_height;
+	bool pass = true;
+
+	glReadBuffer(GL_FRONT);
+	pass = pass && piglit_probe_pixel_rgb(0,     0,     corner);
+	pass = pass && piglit_probe_pixel_rgb(w - 1, 0,     corner);
+	pass = pass && piglit_probe_pixel_rgb(0,     h - 1, corner);
+	pass = pass && piglit_probe_pixel_rgb(w - 1, h - 1, corner);
+	pass = pass && piglit_probe_pixel_rgb(w / 2, h / 2, center);
+
+	return pass;
+}
+
 enum piglit_result piglit_display(void)
 {
 	int w = piglit_width;
@@ -118,13 +135,7 @@ enum piglit_result piglit_display(void)
 	piglit_swap_buffers();
 	glFlush();
 
-	/* The corners should be blue; the center should be green */
-	glReadBuffer(GL_FRONT);
-	pass = pass && piglit_probe_pixel_rgb(0, 0, blue);
-	pass = pass && piglit_probe_pixel_rgb(w - 1, 0, blue);
-	pass = pass && piglit_probe_pixel_rgb(0, h - 1, blue);
-	pass = pass && piglit_probe_pixel_rgb(w - 1, h - 1, blue);
-	pass = pass && piglit_probe_pixel_rgb(w / 2, h / 2, green);
+	pass = pass && test_corner_and_center_colors(blue, green);
 
 	sleep (1);
 
@@ -136,14 +147,8 @@ enum piglit_result piglit_display(void)
 	/* Blit just the magenta square */
 	blit_from_back_to_front(w / 4, h / 4, w / 4 + w / 2, h / 4 + h / 2);
 	glFlush();
-	
-	/* The corners should be blue; the center should be red */
-	glReadBuffer(GL_FRONT);
-	pass = pass && piglit_probe_pixel_rgb(0, 0, blue);
-	pass = pass && piglit_probe_pixel_rgb(w - 1, 0, blue);
-	pass = pass && piglit_probe_pixel_rgb(0, h - 1, blue);
-	pass = pass && piglit_probe_pixel_rgb(w - 1, h - 1, blue);
-	pass = pass && piglit_probe_pixel_rgb(w / 2, h / 2, red);
+
+	pass = pass && test_corner_and_center_colors(blue, red);
 	
 	return pass ? PIGLIT_PASS : PIGLIT_FAIL;
 }
